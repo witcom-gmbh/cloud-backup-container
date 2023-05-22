@@ -39,8 +39,6 @@ steps:
     - name: dockerconfig
       path: /kaniko/.docker
     commands:
-    - stat ./mysql-cloud-backup/release.version
-    - export VERSION=`cat ./mysql-cloud-backup/release.version`
     - >
       /kaniko/executor 
       --context /drone/src/mysql-cloud-backup
