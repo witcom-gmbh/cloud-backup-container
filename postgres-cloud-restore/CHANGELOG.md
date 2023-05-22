@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [postgres-cloud-restore-0.1.0](https://github.com/witcom-gmbh/cloud-backup-container/compare/ba6619e42b937ac246adbb4898663297e1e557e1..postgres-cloud-restore-0.1.0) - 2023-05-22
+#### Features
+- Add postgres-cloud-restore - ([a75b4e4](https://github.com/witcom-gmbh/cloud-backup-container/commit/a75b4e4d0a7e57979a442115273df121ff53e87e)) - [@iceman91176](https://github.com/iceman91176)
+
+- - -
+
 ## [postgres-cloud-restore-0.1.0](https://github.com/iceman91176/container-toolbox/compare/a618bd6f220b4476c201285a7fc4a7327144be0a..postgres-cloud-restore-0.1.0) - 2023-04-13
 #### Documentation
 - **(postgres-cloud-restore)** cleanup docs - ([b589bc2](https://github.com/iceman91176/container-toolbox/commit/b589bc2472e8b9689bbc3749cfe78e12245cfebc)) - [@iceman91176](https://github.com/iceman91176)
