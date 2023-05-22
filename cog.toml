@@ -2,7 +2,7 @@ from_latest_tag = false
 ignore_merge_commits = true
 branch_whitelist = ["main"]
 pre_bump_hooks = []
-post_bump_hooks = ["git push origin"]
+post_bump_hooks = ["git push origin","git push origin {{version}}"]
 pre_package_bump_hooks = ["echo \"{{version}}\" > ./release.version"]
 
 [commit_types]
@@ -21,7 +21,7 @@ authors = [
 [bump_profiles]
 
 [packages]
-postgres-cloud-backup = { path = "postgres-cloud-backup", public_api = false,post_bump_hooks = ["git push origin postgres-cloud-backup-{{version}}"] }
-postgres-cloud-restore = { path = "postgres-cloud-restore", public_api = false,post_bump_hooks = ["git push origin postgres-cloud-restore-{{version}}"] }
-mysql-cloud-backup = { path = "mysql-cloud-backup", public_api = false,post_bump_hooks = ["git push origin mysql-cloud-backup-{{version}}"] }
-mysql-cloud-restore = { path = "mysql-cloud-restore", public_api = false,post_bump_hooks = ["git push origin mysql-cloud-restore-{{version}}"] }
+postgres-cloud-backup = { path = "postgres-cloud-backup", public_api = false,post_bump_hooks = ["git push origin", "git push origin postgres-cloud-backup-{{version}}"] }
+postgres-cloud-restore = { path = "postgres-cloud-restore", public_api = false,post_bump_hooks = ["git push origin","git push origin postgres-cloud-restore-{{version}}"] }
+mysql-cloud-backup = { path = "mysql-cloud-backup", public_api = false,post_bump_hooks = ["git push origin","git push origin mysql-cloud-backup-{{version}}"] }
+mysql-cloud-restore = { path = "mysql-cloud-restore", public_api = false,post_bump_hooks = ["git push origin","git push origin mysql-cloud-restore-{{version}}"] }
