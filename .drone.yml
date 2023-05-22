@@ -1,0 +1,214 @@
+global-variables:
+  environment: &default_environment
+    REGISTRY:
+      from_secret: artifactory-host-01
+    REGISTRY_HELM_PROJECT:  
+      from_secret: artifactory-helm-project-01    
+    USERNAME:
+      from_secret: artifactory-user-01
+    PASSWORD:
+      from_secret: artifactory-password-01
+    REPO_PROJECT: cloud-backup
+
+kind: pipeline
+type: docker
+name: backup-container-with-drone
+platform:
+  os: linux
+  arch: amd64 
+
+steps:
+  - name: Prepare registry secrets
+    image: alpine
+    volumes:  
+    - name: dockerconfig
+      path: /dockerconfig
+    environment:
+      DOCKER_CONFIG:
+        from_secret: artifactory-dockerconfig-01
+    commands:
+    - echo "$DOCKER_CONFIG" > /dockerconfig/config.json
+
+# this calls for jsonnet...
+
+  - name: Build mysql-cloud-backup image
+    image: gcr.io/kaniko-project/executor:debug
+    environment:
+      <<: *default_environment
+    volumes:
+    - name: dockerconfig
+      path: /kaniko/.docker
+    commands:
+    - stat ./mysql-cloud-backup/release.version
+    - export VERSION=`cat ./mysql-cloud-backup/release.version`
+    - >
+      /kaniko/executor 
+      --context /drone/src/mysql-cloud-backup
+      --dockerfile Dockerfile
+      --destination $${REGISTRY}/$${REPO_PROJECT}/mysql-cloud-backup:latest
+      --no-push  
+    when:
+      event:
+        exclude:
+        - tag
+
+  - name: Build and push mysql-cloud-backup image
+    image: gcr.io/kaniko-project/executor:debug
+    environment:
+      <<: *default_environment
+    volumes:
+    - name: dockerconfig
+      path: /kaniko/.docker
+    commands:
+    - stat ./mysql-cloud-backup/release.version
+    - export VERSION=`cat ./mysql-cloud-backup/release.version`
+    - >
+      /kaniko/executor 
+      --context /drone/src/mysql-cloud-backup
+      --dockerfile Dockerfile
+      --destination $${REGISTRY}/$${REPO_PROJECT}/mysql-cloud-backup:$${VERSION}
+      --destination $${REGISTRY}/$${REPO_PROJECT}/mysql-cloud-backup:latest
+    when:
+      event:
+        include:
+        - tag
+      ref:
+      - refs/tags/mysql-cloud-backup-*  
+
+# Mysql cloud-restore
+
+  - name: Build mysql-cloud-restore image
+    image: gcr.io/kaniko-project/executor:debug
+    environment:
+      <<: *default_environment
+    volumes:
+    - name: dockerconfig
+      path: /kaniko/.docker
+    commands:
+    - >
+      /kaniko/executor 
+      --context /drone/src/mysql-cloud-restore
+      --dockerfile Dockerfile
+      --destination $${REGISTRY}/$${REPO_PROJECT}/mysql-cloud-restore:latest
+#      --destination $${REGISTRY}/$${REPO_PROJECT}/mysql-cloud-restore:$${VERSION}      
+    when:
+      event:
+        exclude:
+        - tag
+
+  - name: Build and push mysql-cloud-restore image
+    image: gcr.io/kaniko-project/executor:debug
+    environment:
+      <<: *default_environment
+    volumes:
+    - name: dockerconfig
+      path: /kaniko/.docker
+    commands:
+    - stat ./mysql-cloud-restore/release.version
+    - export VERSION=`cat ./mysql-cloud-restore/release.version`
+    - >
+      /kaniko/executor 
+      --context /drone/src/mysql-cloud-restore
+      --dockerfile Dockerfile
+      --destination $${REGISTRY}/$${REPO_PROJECT}/mysql-cloud-restore:latest
+      --destination $${REGISTRY}/$${REPO_PROJECT}/mysql-cloud-restore:$${VERSION}
+    when:
+      event:
+        include:
+        - tag
+      ref:
+      - refs/tags/mysql-cloud-restore-*  
+
+# postgres backup
+
+  - name: Build postgres-cloud-backup image
+    image: gcr.io/kaniko-project/executor:debug
+    environment:
+      <<: *default_environment
+    volumes:
+    - name: dockerconfig
+      path: /kaniko/.docker
+    commands:
+    - >
+      /kaniko/executor 
+      --context /drone/src/postgres-cloud-backup
+      --dockerfile Dockerfile
+      --destination $${REGISTRY}/$${REPO_PROJECT}/postgres-cloud-backup:latest
+      --no-push  
+    when:
+      event:
+        exclude:
+        - tag
+
+  - name: Build and push postgres-cloud-backup image
+    image: gcr.io/kaniko-project/executor:debug
+    environment:
+      <<: *default_environment
+    volumes:
+    - name: dockerconfig
+      path: /kaniko/.docker
+    commands:
+    - stat ./postgres-cloud-backup/release.version
+    - export VERSION=`cat ./postgres-cloud-backup/release.version`
+    - >
+      /kaniko/executor 
+      --context /drone/src/postgres-cloud-backup
+      --dockerfile Dockerfile
+      --destination $${REGISTRY}/$${REPO_PROJECT}/postgres-cloud-backup:$${VERSION}
+      --destination $${REGISTRY}/$${REPO_PROJECT}/postgres-cloud-backup:latest
+    when:
+      event:
+        include:
+        - tag
+      ref:
+      - refs/tags/postgres-cloud-backup-* 
+
+# postgres backup
+
+  - name: Build postgres-cloud-restore image
+    image: gcr.io/kaniko-project/executor:debug
+    environment:
+      <<: *default_environment
+    volumes:
+    - name: dockerconfig
+      path: /kaniko/.docker
+    commands:
+    - >
+      /kaniko/executor 
+      --context /drone/src/postgres-cloud-restore
+      --dockerfile Dockerfile
+      --destination $${REGISTRY}/$${REPO_PROJECT}/postgres-cloud-restore:latest
+      --no-push  
+    when:
+      event:
+        exclude:
+        - tag
+
+  - name: Build and push postgres-cloud-restore image
+    image: gcr.io/kaniko-project/executor:debug
+    environment:
+      <<: *default_environment
+    volumes:
+    - name: dockerconfig
+      path: /kaniko/.docker
+    commands:
+    - stat ./postgres-cloud-restore/release.version
+    - export VERSION=`cat ./postgres-cloud-restore/release.version`
+    - >
+      /kaniko/executor 
+      --context /drone/src/postgres-cloud-restore
+      --dockerfile Dockerfile
+      --destination $${REGISTRY}/$${REPO_PROJECT}/postgres-cloud-restore:$${VERSION}
+      --destination $${REGISTRY}/$${REPO_PROJECT}/postgres-cloud-restore:latest
+    when:
+      event:
+        include:
+        - tag
+      ref:
+      - refs/tags/postgres-cloud-restore-* 
+
+volumes:
+- name: build-output
+  temp: {}
+- name: dockerconfig
+  temp: {}    
