@@ -1,6 +1,6 @@
 from_latest_tag = false
-ignore_merge_commits = false
-branch_whitelist = []
+ignore_merge_commits = true
+branch_whitelist = ["main"]
 pre_bump_hooks = []
 post_bump_hooks = []
 pre_package_bump_hooks = []
@@ -9,9 +9,20 @@ post_package_bump_hooks = []
 [commit_types]
 
 [changelog]
-path = "CHANGELOG.md"
-authors = []
+template = "monorepo_remote"
+package_template = "package_remote"
+remote = "github.com"
+repository = "cloud-backup-container"
+owner = "witcom-gmbh"
+authors = [
+    { signature = "Carsten Buchberger", username = "iceman91176" },
+]
+
 
 [bump_profiles]
 
 [packages]
+postgres-cloud-backup = { path = "postgres-cloud-backup", public_api = false, pre_bump_hooks = ["echo \"{{version}}\" > ./release.version"] }
+postgres-cloud-restore = { path = "postgres-cloud-restore", public_api = false , pre_bump_hooks = ["echo \"{{version}}\" > ./release.version"] }
+mysql-cloud-backup = { path = "mysql-cloud-backup", public_api = false , pre_bump_hooks = ["echo \"{{version}}\" > ./release.version"] }
+mysql-cloud-restore = { path = "mysql-cloud-restore", public_api = false , pre_bump_hooks = ["echo \"{{version}}\" > ./release.version"] }
